@@ -96,8 +96,8 @@ class PhotoDownloadSingleView(APIView):
 
         with open(photo.watermarked.path, 'rb') as f:
             response = HttpResponse(f.read(), content_type='image/jpeg')
-            filename = photo.original_name or f"{photo.id}.jpg"
-            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            stem = os.path.splitext(photo.original_name or str(photo.id))[0]
+            response['Content-Disposition'] = f'attachment; filename="{stem}.jpg"'
             return response
 
 
