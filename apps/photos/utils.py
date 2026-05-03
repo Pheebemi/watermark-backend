@@ -1,8 +1,8 @@
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 def add_church_watermark(photo_path: str, logo_path: str, output_path: str) -> None:
-    photo = Image.open(photo_path).convert("RGBA")
+    photo = ImageOps.exif_transpose(Image.open(photo_path)).convert("RGBA")
     logo = Image.open(logo_path).convert("RGBA")
 
     # Resize logo to 40% of photo width, preserve aspect ratio
