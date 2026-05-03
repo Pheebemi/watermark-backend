@@ -82,6 +82,25 @@ class PhotoUploadView(APIView):
         })
 
 
+class PhotoDownloadSingleView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, pk):
+        try:
+            photo = Photo.objects.get(pk=pk)
+        except Photo.DoesNotExist:
+            return Response({"success": False, "error": "Photo not found"}, status=404)
+
+        if not photo.watermarked or not os.path.exists(photo.watermarked.path):
+            return Response({"success": False, "error": "Watermarked file not found"}, status=404)
+
+        with open(photo.watermarked.path, 'rb') as f:
+            response = HttpResponse(f.read(), content_type='image/jpeg')
+            filename = photo.original_name or f"{photo.id}.jpg"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            return response
+
+
 class PhotoDownloadZipView(APIView):
     permission_classes = [AllowAny]
 
