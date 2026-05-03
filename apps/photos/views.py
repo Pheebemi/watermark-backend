@@ -4,6 +4,8 @@ import zipfile
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.utils import timezone
+from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
@@ -11,6 +13,20 @@ from rest_framework.permissions import AllowAny
 from .models import Photo
 from .serializers import PhotoSerializer
 from .utils import add_church_watermark
+
+
+def cleanup_old_photos():
+    cutoff = timezone.now() - timedelta(minutes=10)
+    old_photos = Photo.objects.filter(created_at__lt=cutoff)
+    for photo in old_photos:
+        for field in [photo.image, photo.watermarked]:
+            if field:
+                try:
+                    if os.path.exists(field.path):
+                        os.remove(field.path)
+                except Exception:
+                    pass
+    old_photos.delete()
 
 
 class PhotoListView(APIView):
@@ -38,6 +54,8 @@ class PhotoUploadView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
+        cleanup_old_photos()
+
         files = request.FILES.getlist('images')
 
         if not files:
