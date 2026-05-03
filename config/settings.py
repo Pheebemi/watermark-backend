@@ -84,7 +84,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 104857600   # 100MB
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:4321",
-    "https://your-frontend.com",
+    "https://ecwa2.vercel.app",
 ]
 
 REST_FRAMEWORK = {
